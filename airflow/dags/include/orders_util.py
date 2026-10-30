@@ -14,8 +14,7 @@ def extract():
 
 def load():
     df = pd.read_csv(f"{config.DATA_PATH}/raw_sales.csv")
-    # engine = create_engine(config.DATABASE_URL) # noqa E501
-    engine = PostgresHook(postgres_conn_id="supabse_conn").get_sqlalchemy_engine
+    engine = create_engine(config.DATABASE_URL)  # noqa E501
     with engine.connect() as connection:
         print("Connection to database successful!")
         record_no = df.to_sql('raw_sales', connection, if_exists='replace', index=False) # noqa E501
@@ -34,7 +33,7 @@ def transform():
         df = pd.read_sql(query, engine)
 
         print("Starting transformation")
-        df = df.fillna("Unkmown")
+        df = df.fillna("Unknown")
         df = df.drop_duplicates()
         df['order_date'] = pd.to_datetime(df['order_date'])
         df['total_sale'] = df['quantity'] * df['price']
